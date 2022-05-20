@@ -1,0 +1,7 @@
+vcs
+x.x
+*.asm
+*.lst
+*.bin
+*.prg
+*.o
