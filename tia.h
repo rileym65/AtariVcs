@@ -50,6 +50,8 @@ typedef struct {
   byte posbl;
   byte refp0;
   byte refp1;
+  byte resmp0;
+  byte resmp1;
   byte colorp0;
   byte colorp1;
   byte cxm0p;

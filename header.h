@@ -27,10 +27,14 @@ typedef unsigned short word;
 LINK CPU6502  cpu;
 LINK TIA      tia;
 LINK PIA      pia;
-LINK byte       ram[65536];
-LINK char       runDebugger;
+LINK byte     ram[65536];
+LINK char     runDebugger;
 LINK char     power;
 LINK int      dbg_clocks;
+LINK int      pending_tia;
+LINK word     pending_port;
+LINK byte     pending_value;
+
 
 extern void c6502_irq(CPU6502* cpu);
 extern void c6502_nmi(CPU6502* cpu);

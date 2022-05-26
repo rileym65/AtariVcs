@@ -1,18 +1,21 @@
 Debug commands:
-  $FF $00   - Reset cycle counter
-  $FF $01   - Print cycle counter without resetting
-  $FF $02   - Print cycle counter with reset
-  $FF $03   - Print scan line and dot clock
-  $FF $04   - Show cpu registers
-  $FF $05   - Show tia objects
-  $FF $0C   - Print new line
-  $FF $FF   - Exit emulator
+  $FF $00    - Reset cycle counter
+  $FF $01    - Print cycle counter without resetting
+  $FF $02    - Print cycle counter with reset
+  $FF $03    - Print scan line and dot clock
+  $FF $04    - Show cpu registers
+  $FF $05    - Show tia objects
+  $FF $06 nn - Print nn
+  $FF $0C    - Print new line
+  $FF $FF    - Exit emulator
 
   ?              - dump memory
   ?C             - Show clock ticks since last clock reset
   ?C-            - Show clock ticks since last clock reset and reset
   ?P             - dump memory from PC
+  ?PI            - show PIA registers
   ?S             - dump stack
+  ?T             - show TIA registers
   $              - disassemble memory
   $P             - disassemble memory from PC
   !addr bb bb .. - store bytes at address
@@ -39,4 +42,94 @@ Debug commands:
   X=bb           - set X to bb
   Y=bb           - set Y to bb
   /              - exit
+
+VSYNC
+---- --V-
+  V=0   - Vsync off
+  V=1   - Vsync on
+
+VBLANK
+DL-- --V-
+  D=0 - Disable dump path to ground
+   =1 - Enable dump path to ground
+  L=0 - Disable I4,I5 latches
+   =1 - Enable I4,I5 latches
+  V=0 - Disable vblank
+   =1 - Enable vblank
+
+WSYNC
+  Strope to force CPU to wait until end of scan line
+
+CTRLPF
+--BB -PSR
+  BB=00 - Ball size 1 clock
+    =01 - Ball size 2 clocks
+    =10 - Ball size 4 clocks
+    =11 - Ball size 8 clocks
+   P= 0 - Players have priority over playfield
+    = 1 - Playfield has priority over players
+   S= 0 - Scoreboard mode disabled
+    = 1 - Scoreboard mode enabled
+   R=0  - Playfield is copied to right side
+    =1  - Playfield is reflected to right side
+
+NUSIZ0 (NUSIZ1)
+--MM -PPP
+  MM=00 - 1 clock
+     01 - 2 clocks
+     10 - 4 clocks
+     11 - 8 clocks
+ PPP=000 - 1 copy
+    =001 - 2 copies close
+    =010 - 2 copies medium
+    =011 - 3 copies close
+    =100 - 2 copies wide
+    =101 - double size player
+    =110 - 3 copies medium
+    =111 - quad size player
+
+REFP0 (REFP1)
+--- R---
+  R=0 - Player graphics not reversed
+   =1 - Player graphics reversed
+
+ENAM0 (ENAM1, ENABL)
+---- --E-
+  E=0 - Object disabled
+   =1 - Object enabled
+
+RESMP0 (RESMP1)
+---- --L-
+  L=0 - Missile not locked to player
+   =1 - Missile locked to player
+
+RESP0 (RESP1, RESM0, RESM1, RESBL)
+  Strobe to set player graphic to current dot clock
+
+HMOVE
+  Strobe at beginning of horizontal blank to apply horizontal motion registers
+
+HMCLR
+  Strobe to set all horizontal motion registers to 0
+
+HMP0 (HMP1, HMM0, HMM1, HMBL)
+  Set horizontal motion register
+DDDD ----
+ 0111 - Move left 7
+ 0110 - Move left 6
+ 0101 - Move left 5
+ 0100 - Move left 4
+ 0011 - Move left 3
+ 0010 - Move left 2
+ 0001 - Move left 1
+ 0000 - No movement
+ 1111 - Move right 1
+ 1110 - Move right 2
+ 1101 - Move right 3
+ 1100 - Move right 4
+ 1011 - Move right 5
+ 1010 - Move right 6
+ 1001 - Move right 7
+ 1000 - Move right 8
+
 

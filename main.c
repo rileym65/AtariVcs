@@ -2,10 +2,6 @@
 #include "header.h"
 #include "cpu6502.h"
 
-int pending_tia;
-word pending_port;
-byte pending_value;
-
 byte readMem(word address) {
   if (address >= 0x100 && address <= 0x1ff) address -= 0x100;
   address &= 0x1fff;
@@ -99,6 +95,7 @@ int main(int argc, char** argv) {
                  printf("ENAM1:%02x POSM1:%02x HMM1:%02x, COLUM1:%02x\n",
                         tia.enam1, tia.posm1, tia.hmm1, tia.colorp1);
                  break;
+            case 0x06: printf("#%d\n",readMem(cpu.pc++)); break;
             case 0x0c: printf("\n"); break;
             case 0xff: exit(1);
             }

@@ -76,6 +76,7 @@ void UpdateScreen() {
   GotoXY(9,19); if (cpu.p & FLAG_I) printf("I"); else printf("-");
   GotoXY(11,19); if (cpu.p & FLAG_Z) printf("Z"); else printf("-");
   GotoXY(13,19); if (cpu.p & FLAG_C) printf("C"); else printf("-");
+  GotoXY(30,19); printf("Scanline: %03d  Dot Clock: %03d",tia.ScanLine, tia.DotClock);
   }
 
 void Output(char* msg) {
@@ -92,15 +93,77 @@ void Output(char* msg) {
 
 void debugger_qm(char* line) {
   char l[70];
-  char t[6];
+  char t[32];
   int  stack;
   int  x,y;
+  byte b;
   stack = 0;
   if (*line == 'c' || *line == 'C') {
     sprintf(l,"Clocks: %u",clocks);
     Output(l);
     line++;
     if (*line == '-') clocks = 0;
+    return;
+    }
+  if (*line == 't' || *line == 'T') {
+    sprintf(l," VSYNC:%02x  VBLANK:%02x",tia.vsync,tia.vblank);
+    Output(l);
+    sprintf(l,"  GRP0:%02x  COLUP0:%02x  POSP0:%02x  HMP0:%02x  REFP0:%02x  ",
+      tia.grp0, tia.colorp0, tia.posp0, tia.hmp0, tia.refp0);
+    strcpy(t,"");
+    b = tia.grp0;
+    for (x=0; x<8; x++) {
+      if (b & 0x80) strcat(t,"#"); else strcat(t,"_");
+      b <<= 1;
+      }
+    strcat(l, t);
+    Output(l);
+    sprintf(l,"  GRP1:%02x  COLUP1:%02x  POSP1:%02x  HMP1:%02x  REFP1:%02x  ",
+      tia.grp1, tia.colorp1, tia.posp1, tia.hmp1, tia.refp1);
+    strcpy(t,"");
+    b = tia.grp1;
+    for (x=0; x<8; x++) {
+      if (b & 0x80) strcat(t,"#"); else strcat(t,"_");
+      b <<= 1;
+      }
+    strcat(l, t);
+    Output(l);
+    sprintf(l," ENAM0:%02x  RESMP0:%02x  POSM0:%02x  HMM0:%02x",
+      tia.enam0, tia.resmp0, tia.posm0, tia.hmm0);
+    Output(l);
+    sprintf(l," ENAM1:%02x  RESMP1:%02x  POSM1:%02x  HMM1:%02x",
+      tia.enam1, tia.resmp1, tia.posm1, tia.hmm1);
+    Output(l);
+    sprintf(l," ENABL:%02x             POSBL:%02x  HMBL:%02x",
+      tia.enabl, tia.posbl, tia.hmbl);
+    Output(l);
+    sprintf(l,"NUSIZ0:%02x  NUSIZ1:%02x",tia.nusiz0, tia.nusiz1);
+    Output(l);
+    sprintf(l,"COLUBK:%02x  COLUPF:%02x  CTRLPF:%02x  ",
+      tia.background << 1, tia.pfForeground << 1, tia.ctrlpf);
+    strcpy(t,"");
+    y = tia.playfield;
+    for (x=0; x<20; x++) {
+      if (y & 0x80000) strcat(t,"#"); else strcat(t,"_");
+      y <<= 1;
+      }
+    strcat(l, t);
+    Output(l);
+    sprintf(l," CXM0P:%02x   CXM1P:%02x  CXP0FB:%02x  CXP1FB:%02x",
+      tia.cxm0p, tia.cxm1p, tia.cxp0fb, tia.cxp1fb);
+    Output(l);
+    sprintf(l,"CXM0FB:%02x  CXM1FB:%02x  CXBLPF:%02x  CXPPMM:%02x",
+      tia.cxm0fb, tia.cxm1fb, tia.cxblpf, tia.cxppmm);
+    Output(l);
+    sprintf(l," INPT4:%02x   INPT5:%02x", tia.inpt4, tia.inpt5);
+    Output(l);
+    return;
+    }
+  if ((*line == 'p' || *line == 'P') &&
+      (*(line+1) == 'i' || *(line+1) == 'I')) {
+    sprintf(l,"TINT:%2x  TIMER:%02x  SWCHA:%02x  SWCHB:%02x",
+      pia.tint, pia.timer, pia.swcha, pia.swchb);
+    Output(l);
     return;
     }
   if (IsHex(line)) address = GetHex(line);
@@ -114,7 +177,7 @@ void debugger_qm(char* line) {
       else sprintf(l,"%04x:",address);
     for (x=0; x<16; x++) {
       if (stack) sprintf(t," %02x",ram[0x100 + ((address++) & 0xff)]);
-        else sprintf(t," %02x",ram[address++]);
+        else sprintf(t," %02x",ram[(address++) & 0x1fff]);
       strcat(l, t);
       }
     Output(l);
@@ -304,6 +367,25 @@ void debugger_y(char*line) {
     }
   }
 
+void debugger_step() {
+  c6502_cycle(&cpu);
+  dbg_clocks += cpu.clocks;
+  cpu.clocks *= 3;
+  while (cpu.clocks != 0) {
+    tia_cycle(&tia);
+    pia_cycle(&pia);
+    cpu.clocks--;
+    }
+  if (pending_tia) {
+    tia_write(&tia, pending_port, pending_value);
+    pending_tia = 0;
+    }
+  while (cpu.idle != 0) {
+    tia_cycle(&tia);
+    pia_cycle(&pia);
+    }
+  }
+
 void debugger_run(char* line) {
   int i;
   int run;
@@ -315,8 +397,7 @@ void debugger_run(char* line) {
       Disassem(cpu.pc, dis);
       Output(dis);
       }
-    c6502_cycle(&cpu);
-    clocks += cpu.clocks;
+    debugger_step();
     for (i=0; i<numBreakpoints; i++)
       if (cpu.pc == breakpoints[i]) {
         run = 0;
@@ -376,8 +457,7 @@ void Debugger() {
         Disassem(cpu.pc, dis);
         Output(dis);
         }
-      c6502_cycle(&cpu);
-      clocks += cpu.clocks;
+      debugger_step();
       UpdateScreen();
       }
     }

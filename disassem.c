@@ -1,8 +1,11 @@
 #include "header.h"
 
 word Disassem(word addr, char* dest) {
+  word hi;
   char tmp[80];
-  sprintf(dest,"%04x: %02x ", addr, ram[addr]);
+  sprintf(dest,"%04x: %02x ", addr, ram[addr & 0x1fff]);
+  hi = (addr & 0xe000);
+  addr &= 0x1fff;
   switch (ram[addr]) {
     case 0x00:
          sprintf(tmp,"      BRK");
@@ -596,6 +599,6 @@ word Disassem(word addr, char* dest) {
          sprintf(tmp,"      DB   %02x",ram[addr]); addr++; break;
     }
   strcat(dest, tmp);
-  return addr;
+  return ((addr & 0x1fff) | hi);
   }
 

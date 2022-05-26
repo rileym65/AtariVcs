@@ -91,6 +91,8 @@ dbg_prtctr equ    $01      ; Print cycle counter without clear
 dbg_prtclr equ    $02      ; Print cycle counter and clear
 dbg_sldc   equ    $03      ; Print scan line and dot clock
 dbg_cpu    equ    $04      ; Show cpu registers
+dbg_tia    equ    $05      ; Show TIA registers
+dbg_number equ    $06      ; Show following number
 dbg_nl     equ    $0c      ; Output new line
 dbg_exit   equ    $ff      ; Exit emulator
 

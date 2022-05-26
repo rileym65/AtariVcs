@@ -110,8 +110,10 @@ void tia_init(TIA *tia) {
   tia->cxm1fb = 0;
   tia->cxblpf = 0;
   tia->cxppmm = 0;
-  tia->inpt4 = 0;
-  tia->inpt5 = 0;
+  tia->inpt4 = 0xff;
+  tia->inpt5 = 0xff;
+  tia->resmp0 = 0;
+  tia->resmp1 = 0;
   }
 
 void tia_cycle(TIA *tia) {
@@ -144,17 +146,17 @@ void tia_cycle(TIA *tia) {
           if (key == XK_Right) pia.swcha = (pia.swcha & 0xf0) | 0x08; 
           if (key == XK_Up) pia.swcha = (pia.swcha & 0xf0) | 0x01; 
           if (key == XK_Down) pia.swcha = (pia.swcha & 0xf0) | 0x02; 
-          if (key == 'a' || key == 'A') pia.swcha = (pia.swcha & 0x0f) | 0x40;
-          if (key == 'd' || key == 'D') pia.swcha = (pia.swcha & 0x0f) | 0x80;
-          if (key == 'w' || key == 'W') pia.swcha = (pia.swcha & 0x0f) | 0x10;
-          if (key == 's' || key == 'S') pia.swcha = (pia.swcha & 0x0f) | 0x20;
+          if (key == 'a' || key == 'A') pia.swcha &= 0xbf;
+          if (key == 'd' || key == 'D') pia.swcha &= 0x7f;
+          if (key == 'w' || key == 'W') pia.swcha &= 0xef;
+          if (key == 's' || key == 'S') pia.swcha &= 0xdf;
           if (key == XK_F3) pia.swchb ^= 0x08;
           if (key == XK_F4) pia.swchb ^= 0x40;
           if (key == XK_F5) pia.swchb ^= 0x80;
-          if (key == XK_F6) pia.swchb |= 0x02;
-          if (key == XK_F7) pia.swchb |= 0x01;
-          if (key == XK_Shift_L) tia->inpt4 = 0x80;
-          if (key == XK_Shift_R) tia->inpt5 = 0x80;
+          if (key == XK_F6) pia.swchb &= 0xfd;
+          if (key == XK_F7) pia.swchb &= 0xfe;
+          if (key == XK_Shift_L) tia->inpt4 &= 0x7f;
+          if (key == XK_Shift_R) tia->inpt5 &= 0x7f;
           }
         else if (event.type == KeyRelease) {
           XLookupString((XKeyEvent*)&event, tmp, 10, &key, &status);
@@ -162,16 +164,16 @@ void tia_cycle(TIA *tia) {
           if (key == XK_Right) pia.swcha = (pia.swcha & 0xf0);
           if (key == XK_Up) pia.swcha = (pia.swcha & 0xf0);
           if (key == XK_Down) pia.swcha = (pia.swcha & 0xf0);
-          if (key == 'a' || key == 'A') pia.swcha = (pia.swcha & 0x0f);
-          if (key == 'd' || key == 'D') pia.swcha = (pia.swcha & 0x0f);
-          if (key == 'w' || key == 'W') pia.swcha = (pia.swcha & 0x0f);
-          if (key == 's' || key == 'S') pia.swcha = (pia.swcha & 0x0f);
+          if (key == 'a' || key == 'A') pia.swcha |= 0x40;
+          if (key == 'd' || key == 'D') pia.swcha |= 0x80;
+          if (key == 'w' || key == 'W') pia.swcha |= 0x01;
+          if (key == 's' || key == 'S') pia.swcha |= 0x02;
           if (key == XK_F2) power = 'N';
           if (key == XK_Escape) power = 'N';
-          if (key == XK_F6) pia.swchb &= 0xfd;
-          if (key == XK_F7) pia.swchb &= 0xfe;
-          if (key == XK_Shift_L) tia->inpt4 = 0x00;
-          if (key == XK_Shift_R) tia->inpt5 = 0x00;
+          if (key == XK_F6) pia.swchb |= 0x02;
+          if (key == XK_F7) pia.swchb |= 0x01;
+          if (key == XK_Shift_L) tia->inpt4 |= 0x80;
+          if (key == XK_Shift_R) tia->inpt5 |= 0x80;
           }
         else printf("Unknown X event\n");
         }
@@ -179,6 +181,16 @@ void tia_cycle(TIA *tia) {
     }
 
   unsigned int clr;
+  if (tia->resmp0 & 2) {
+    if ((tia->nusiz0 & 0x07) == 0x05) tia->posm0 = tia->posp0 + 7;
+    else if ((tia->nusiz0 & 0x07) == 0x07) tia->posm0 = tia->posp0 + 15;
+    else tia->posm0 = tia->posp0 + 3;
+    }
+  if (tia->resmp1 & 2) {
+    if ((tia->nusiz1 & 0x07) == 0x05) tia->posm1 = tia->posp1 + 7;
+    else if ((tia->nusiz1 & 0x07) == 0x07) tia->posm1 = tia->posp1 + 15;
+    else tia->posm1 = tia->posp1 + 3;
+    }
   tia->DotClock++;
   if (tia->DotClock == 228) {
     tia->DotClock = 0;
@@ -443,6 +455,8 @@ void tia_write(TIA *tia, byte port, byte value) {
   if (port == 0x22) tia->hmm0 = tia_convertOffset(value);
   if (port == 0x23) tia->hmm1 = tia_convertOffset(value);
   if (port == 0x24) tia->hmbl = tia_convertOffset(value);
+  if (port == 0x28) tia->resmp0 = value;
+  if (port == 0x29) tia->resmp1 = value;
   if (port == 0x2a) {
     tia->posp0 += tia->hmp0;
     tia->posp1 += tia->hmp1;
@@ -488,8 +502,8 @@ byte tia_read(TIA *tia, byte port) {
   if (port == 0x35) return tia->cxm1fb;
   if (port == 0x36) return tia->cxblpf;
   if (port == 0x37) return tia->cxppmm;
-  if (port == 0x3c) return (tia->inpt4 ^ 0xff);
-  if (port == 0x3d) return (tia->inpt5 ^ 0xff);
+  if (port == 0x3c) return tia->inpt4;
+  if (port == 0x3d) return tia->inpt5;
   }
 
 

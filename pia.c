@@ -7,6 +7,8 @@ void pia_init(PIA *pia) {
   pia->divider = 1024;
   pia->ticks = 0;
   pia->subticks = 0;
+  pia->swcha = 0xff;
+  pia->swchb = 0xff;
   }
 
 void pia_cycle(PIA *pia) {
@@ -28,8 +30,8 @@ void pia_cycle(PIA *pia) {
   }
 
 byte pia_read(PIA *pia, word address) {
-  if (address == 0x280) return (pia->swcha ^ 0xff);
-  if (address == 0x282) return (pia->swchb ^ 0xff);
+  if (address == 0x280) return pia->swcha;
+  if (address == 0x282) return pia->swchb;
   if (address == 0x284) return pia->timer;
   return 0xff;
   }
