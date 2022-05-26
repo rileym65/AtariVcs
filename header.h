@@ -28,6 +28,7 @@ LINK CPU6502  cpu;
 LINK TIA      tia;
 LINK PIA      pia;
 LINK byte     ram[65536];
+LINK int      run;
 LINK char     runDebugger;
 LINK char     power;
 LINK int      dbg_clocks;

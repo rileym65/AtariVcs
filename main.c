@@ -21,6 +21,7 @@ void writeMem(word address, byte value) {
     pending_port = address;
     pending_value = value;
     pending_tia = 0xff;
+    if (address == 0x02 && tia.DotClock > 218) printf("Warning: Late write to WSYNC\n");
 //    tia_write(&tia, address, value);
     }
   else if (address >= 0x280 && address <= 0x297) {

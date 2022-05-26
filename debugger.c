@@ -388,7 +388,6 @@ void debugger_step() {
 
 void debugger_run(char* line) {
   int i;
-  int run;
   char dis[1024];
   run = -1;
   if (IsHex(line)) cpu.pc = GetHex(line);

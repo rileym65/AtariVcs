@@ -168,8 +168,8 @@ void tia_cycle(TIA *tia) {
           if (key == 'd' || key == 'D') pia.swcha |= 0x80;
           if (key == 'w' || key == 'W') pia.swcha |= 0x01;
           if (key == 's' || key == 'S') pia.swcha |= 0x02;
-          if (key == XK_F2) power = 'N';
-          if (key == XK_Escape) power = 'N';
+          if (key == XK_F2) { power = 'N'; run = 0; }
+          if (key == XK_Escape) { power = 'N'; run = 0; }
           if (key == XK_F6) pia.swchb |= 0x02;
           if (key == XK_F7) pia.swchb |= 0x01;
           if (key == XK_Shift_L) tia->inpt4 |= 0x80;
