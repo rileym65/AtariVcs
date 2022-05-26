@@ -133,3 +133,207 @@ DDDD ----
  1000 - Move right 8
 
 
+6507 instruction set
+--------------------
+ADC  (n,X)  61   0110 0001      6
+ADC  n      65   0110 0101      3
+ADC  #n     69   0110 1001      2
+ADC  nn     6D   0110 1101      4
+ADC  (n),Y  71   0111 0001      5+
+ADC  n,X    75   0111 0101      4
+ADC  nn,Y   79   0111 1001      4+
+ADC  nn,X   7D   0111 1101      4+
+  
+AND  (n,X)  21   0010 0001      6
+AND  n      25   0010 0101      3
+AND  #n     29   0010 1001      2
+AND  nn     2D   0010 1101      4
+AND  (n),Y  31   0011 0001      5+
+AND  n,X    35   0011 0101      4
+AND  nn,Y   39   0011 1001      4+
+AND  nn,X   3D   0011 1101      4+
+  
+ASL  n      06   0000 0110      5
+ASL  A      0A   0000 1010      2
+ASL  nn     0E   0000 1110      6
+ASL  n,X    16   0001 0110      6
+ASL  nn,X   1E   0001 1110      7
+  
+BCC  n      90   1001 0000      2+
+BCS  n      B0   1011 0000      2+
+BEQ  n      F0   1111 0000      2+
+BNE  n      D0   1101 0000      2+
+BMI  n      30   0011 0000      2+
+BPL  n      10   0001 0000      2+
+BVC  n      50   0101 0000      2+
+BVS  n      70   0111 0000      2+
+  
+BIT  n      24   0010 0100      3
+BIT  nn     2C   0010 1100      4
+  
+BRK         00                  7
+  
+CLC         18                  2
+  
+CLD         D8                  2
+  
+CLI         58                  2
+  
+CLV         B8                  2
+  
+CMP  (n,X)  C1   1100 0001      6
+CMP  n      C5   1100 0101      3
+CMP  #n     C9   1100 1001      2
+CMP  nn     CD   1100 1101      4
+CMP  (n),Y  D1   1101 0001      5+
+CMP  n,X    D5   1101 0101      4
+CMP  nn,Y   D9   1101 1001      4+
+CMP  nn,X   DD   1101 1101      4+
+  
+CPX  #n     E0   1110 0000      2
+CPX  n      E4   1110 0100      3
+CPX  nn     EC   1110 1100      4
+  
+CPY  #n     C0   1100 0000      2
+CPY  n      C4   1100 0100      3
+CPY  nn     CC   1100 1100      4
+  
+  
+DEC  n      C6   1100 0110      5
+DEC  nn     CE   1100 1110      6
+DEC  n,X    D6   1101 0110      6
+DEC  nn,X   DE   1101 1110      7
+  
+DEX         CA                  2
+  
+DEY         88                  2
+  
+EOR  (n,X)  41   0100 0001      6
+EOR  n      45   0100 0101      3
+EOR  #n     49   0100 1001      2
+EOR  nn     4D   0100 1101      4
+EOR  (n),Y  51   0101 0001      5+
+EOR  n,X    55   0101 0101      4
+EOR  nn,Y   59   0101 1001      4+
+EOR  nn,X   5D   0101 1101      4+
+  
+  
+INC  n      E6   1110 0110      5
+INC  nn     EE   1110 1110      6
+INC  n,X    F6   1111 0110      6
+INC  nn,X   FE   1111 1110      7
+  
+INX         E8                  2
+  
+INY         C8                  2
+  
+JMP  nn     4C   0100 1100      3
+JMP  (nn)   6C   0110 1100      5
+  
+JSR  nn     20                  6
+  
+LDA  (n,X)  A1   1010 0001      6
+LDA  n      A5   1010 0101      3
+LDA  #n     A9   1010 1001      2
+LDA  nn     AD   1010 1101      4
+LDA  (n),Y  B1   1011 0001      5+
+LDA  n,X    B5   1011 0101      4
+LDA  nn,Y   B9   1011 1001      4+
+LDA  nn,X   BD   1011 1101      4+
+  
+LDX  #n     A2   1010 0010      2
+LDX  n      A6   1010 0110      3
+LDX  nn     AE   1010 1110      4
+LDX  n,Y    B6   1011 0110      4
+LDX  nn,Y   BE   1011 1110      4+
+  
+LDY  #n     A0   1010 0000      2
+LDY  n      A4   1010 0100      3
+LDY  nn     AC   1010 1100      4
+LDY  n,X    B4   1011 0100      4
+LDY  nn,X   BC   1011 1100      4+
+  
+LSR  n      46   0100 0110      5
+LSR  A      4A   0100 1010      2
+LSR  nn     4E   0100 1110      6
+LSR  n,X    56   0101 0110      6
+LSR  nn,X   5E   0101 1110      7
+  
+NOP         EA                  2
+  
+ORA  (n,X)  01   0000 0001      6
+ORA  n      05   0000 0101      3
+ORA  #n     09   0000 1001      2
+ORA  nn     0D   0000 1101      4
+ORA  (n),Y  11   0001 0001      5+
+ORA  n,X    15   0001 0101      4
+ORA  nn,Y   19   0001 1001      4+
+ORA  nn,X   1D   0001 1101      4+
+  
+PHA         48                  3
+PHP         08                  3
+  
+PLA         68                  4
+PLP         28                  4
+  
+ROL  n      26   0010 0110      5
+ROL  A      2A   0010 1010      2
+ROL  nn     2E   0010 1110      6
+ROL  n,X    36   0011 0110      6
+ROL  nn,X   3E   0011 1110      7
+  
+ROR  n      66   0110 0110      5
+ROR  A      6A   0110 1010      2
+ROR  nn     6E   0110 1110      6
+ROR  n,X    76   0111 0110      6
+ROR  nn,X   7E   0111 1110      7
+  
+RTI         40                  6
+  
+RTS         60                  6
+  
+SBC  (n,X)  E1   1110 0001      6
+SBC  n      E5   1110 0101      3
+SBC  #n     E9   1110 1001      2
+SBC  nn     ED   1110 1101      4
+SBC  (n),Y  F1   1111 0001      5+
+SBC  n,X    F5   1111 0101      4
+SBC  nn,Y   F9   1111 1001      4+
+SBC  nn,X   FD   1111 1101      4+
+  
+SEC         38                  2
+  
+SED         F8                  2
+  
+SEI         78                  2
+  
+STA  (n,X)  81   1000 0001      6
+STA  n      85   1000 0101      3
+STA  nn     8D   1000 1101      4
+STA  (n),Y  91   1001 0001      6
+STA  n,X    95   1001 0101      4
+STA  nn,Y   99   1001 1001      5
+STA  nn,X   9D   1001 1101      5
+  
+STX  n      86   1000 0110      3
+STX  nn     8E   1000 1110      4
+STX  n,Y    96   1001 0110      4
+  
+STY  n      84   1000 0100      3
+STY  nn     8C   1000 1100      4
+STY  n,X    94   1001 0100      4
+  
+TAX         AA                  2
+  
+TAY         A8                  2
+  
+TSX         BA                  2
+  
+TXA         8A                  2
+  
+TXS         9A                  2
+  
+TYA         98                  2
+
+
+
