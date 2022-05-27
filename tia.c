@@ -84,7 +84,7 @@ void tia_init(TIA *tia) {
   XFlush(display);
   tia->ScanLine = 0;
   tia->DotClock = 0;
-  tia->background = 0;
+  tia->colubk = 0;
   tia->grp0 = 0;
   tia->grp1 = 0;
   tia->posp0 = 20;
@@ -355,38 +355,38 @@ void tia_cycle(TIA *tia) {
       if (cbl && cpf) tia->cxblpf |= 0x80;
       if (cp0 && cp1) tia->cxppmm |= 0x80;
       if (cm0 && cm1) tia->cxppmm |= 0x40;
-      clr = tia_colors[tia->background];
+      clr = tia_colors[tia->colubk];
       if ((tia->ctrlpf & 0x04) == 0) {
         if (cpf) {
           if ((tia->ctrlpf & 2) == 0)
-            clr = tia_colors[tia->pfForeground];
+            clr = tia_colors[tia->colupf];
           else
             if (tia->DotClock < 148)
-              clr = tia_colors[tia->colorp0];
+              clr = tia_colors[tia->colup0];
             else
-              clr = tia_colors[tia->colorp1];
+              clr = tia_colors[tia->colup1];
           }
-        if (cbl) clr = tia_colors[tia->pfForeground];
-        if (cp1) clr = tia_colors[tia->colorp1];
-        if (cm1) clr = tia_colors[tia->colorp1];
-        if (cp0) clr = tia_colors[tia->colorp0];
-        if (cm0) clr = tia_colors[tia->colorp0];
+        if (cbl) clr = tia_colors[tia->colupf];
+        if (cp1) clr = tia_colors[tia->colup1];
+        if (cm1) clr = tia_colors[tia->colup1];
+        if (cp0) clr = tia_colors[tia->colup0];
+        if (cm0) clr = tia_colors[tia->colup0];
         }
       else {
-        if (cp1) clr = tia_colors[tia->colorp1];
-        if (cm1) clr = tia_colors[tia->colorp1];
-        if (cp0) clr = tia_colors[tia->colorp0];
-        if (cm0) clr = tia_colors[tia->colorp0];
+        if (cp1) clr = tia_colors[tia->colup1];
+        if (cm1) clr = tia_colors[tia->colup1];
+        if (cp0) clr = tia_colors[tia->colup0];
+        if (cm0) clr = tia_colors[tia->colup0];
         if (cpf) {
           if ((tia->ctrlpf & 2) == 0)
-            clr = tia_colors[tia->pfForeground];
+            clr = tia_colors[tia->colupf];
           else
             if (tia->DotClock < 148)
-              clr = tia_colors[tia->colorp0];
+              clr = tia_colors[tia->colup0];
             else
-              clr = tia_colors[tia->colorp1];
+              clr = tia_colors[tia->colup1];
           }
-        if (cbl) clr = tia_colors[tia->pfForeground];
+        if (cbl) clr = tia_colors[tia->colupf];
         }
       }
     else {
@@ -410,10 +410,10 @@ void tia_write(TIA *tia, byte port, byte value) {
   if (port == 0x02) { cpu.idle = 0xff; cpu.clocks = 0; }
   if (port == 0x04) tia->nusiz0 = value;
   if (port == 0x05) tia->nusiz1 = value;
-  if (port == 0x06) tia->colorp0 = value >> 1;
-  if (port == 0x07) tia->colorp1 = value >> 1;
-  if (port == 0x08) tia->pfForeground = value >> 1;
-  if (port == 0x09) tia->background = value >> 1;
+  if (port == 0x06) tia->colup0 = value >> 1;
+  if (port == 0x07) tia->colup1 = value >> 1;
+  if (port == 0x08) tia->colupf = value >> 1;
+  if (port == 0x09) tia->colubk = value >> 1;
   if (port == 0x0a) tia->ctrlpf = value;
   if (port == 0x0b) tia->refp0 = value;
   if (port == 0x0c) tia->refp1 = value;

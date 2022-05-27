@@ -43,6 +43,7 @@ extern void c6502_reset(CPU6502* cpu);
 
 extern void Debugger();
 extern word Disassem(word addr, char* dest);
+extern int evaluate(char* expr);
 extern int loadFile(char* filename);
 
 #endif

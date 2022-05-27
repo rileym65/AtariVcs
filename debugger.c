@@ -7,6 +7,9 @@ int  numBreakpoints;
 int  tracing;
 byte traps[256];
 unsigned int clocks;
+char conditions[100][256];
+int  numConditions;
+char useConditions;
 
 void Cls() {
   printf("\e[H\e[2J");
@@ -109,7 +112,7 @@ void debugger_qm(char* line) {
     sprintf(l," VSYNC:%02x  VBLANK:%02x",tia.vsync,tia.vblank);
     Output(l);
     sprintf(l,"  GRP0:%02x  COLUP0:%02x  POSP0:%02x  HMP0:%02x  REFP0:%02x  ",
-      tia.grp0, tia.colorp0, tia.posp0, tia.hmp0, tia.refp0);
+      tia.grp0, tia.colup0, tia.posp0, tia.hmp0, tia.refp0);
     strcpy(t,"");
     b = tia.grp0;
     for (x=0; x<8; x++) {
@@ -119,7 +122,7 @@ void debugger_qm(char* line) {
     strcat(l, t);
     Output(l);
     sprintf(l,"  GRP1:%02x  COLUP1:%02x  POSP1:%02x  HMP1:%02x  REFP1:%02x  ",
-      tia.grp1, tia.colorp1, tia.posp1, tia.hmp1, tia.refp1);
+      tia.grp1, tia.colup1, tia.posp1, tia.hmp1, tia.refp1);
     strcpy(t,"");
     b = tia.grp1;
     for (x=0; x<8; x++) {
@@ -140,7 +143,7 @@ void debugger_qm(char* line) {
     sprintf(l,"NUSIZ0:%02x  NUSIZ1:%02x",tia.nusiz0, tia.nusiz1);
     Output(l);
     sprintf(l,"COLUBK:%02x  COLUPF:%02x  CTRLPF:%02x  ",
-      tia.background << 1, tia.pfForeground << 1, tia.ctrlpf);
+      tia.colubk << 1, tia.colupf << 1, tia.ctrlpf);
     strcpy(t,"");
     y = tia.playfield;
     for (x=0; x<20; x++) {
@@ -213,6 +216,33 @@ void debugger_ex(char*line) {
     }
   }
 
+void debugger_gt(char *line) {
+  int   i;
+  FILE *file;
+  char  buffer[1024];
+  file = fopen(line, "w");
+  if (file == NULL) return;
+  fprintf(file,"BC\n");
+  for (i=0; i<numBreakpoints; i++)
+    fprintf(file, "B+%04x\n",breakpoints[i]);
+  fprintf(file,"TC\n");
+  for (i=0; i<256; i++)
+    if (traps[i] != 0)
+      fprintf(file, "T+%02x\n",i);
+  fprintf(file,"CC\n");
+  for (i=0; i<numConditions; i++)
+    fprintf(file, "C+%s\n",conditions[i]);
+  if (useConditions == 'Y')
+    fprintf(file,"C++\n");
+  else
+    fprintf(file,"C--\n");
+  if (tracing != 0)
+    fprintf(file,"TR+\n");
+  else
+    fprintf(file,"TR-\n");
+  fclose(file);
+  }
+
 void debugger_a(char*line) {
   if (*line == '=') {
     line++;
@@ -265,6 +295,48 @@ void debugger_b(char* line) {
     }
   if (*line == 'c' || *line == 'C') {
     numBreakpoints = 0;
+    return;
+    }
+  }
+
+void debugger_c(char*line) {
+  int i;
+  int j;
+  char outp[300];
+  if (*line == '?') {
+    Output("Conditional breakpoints:");
+    for (i=0; i<numConditions; i++) {
+      sprintf(outp,"%d:%s",i+1,conditions[i]);
+      Output(outp);
+      }
+    return;
+    }
+  if (*line == '+' && *(line+1) == '+') {
+    useConditions = 'Y'; 
+    Output("Conditions enabled");
+    return;
+    }
+  if (*line == '-' && *(line+1) == '-') {
+    useConditions = 'N'; 
+    Output("Conditions disabled");
+    return;
+    }
+  if (*line == '+') {
+    line++;
+    strcpy(conditions[numConditions++], line);
+    return;
+    }
+  if (*line == '-') {
+    line++;
+    j = atoi(line) - 1;
+    if (j >= 0 && j < numConditions) {
+      for (i=j; i<numConditions-1; i++)
+        strcpy(conditions[i], conditions[i+1]);
+      numConditions--;
+      }
+    }
+  if (*line == 'c' || *line == 'C') {
+    numConditions = 0;
     return;
     }
   }
@@ -402,11 +474,52 @@ void debugger_run(char* line) {
         run = 0;
         UpdateScreen();
         }
+    if (useConditions == 'Y') {
+      for (i=0; i<numConditions; i++)
+        if (evaluate(conditions[i]) != 0) {
+          run = 0;
+          UpdateScreen();
+          }
+      }
     if (traps[ram[cpu.pc]] != 0) {
       run = 0;
       UpdateScreen();
       }
     }
+  }
+
+void debugger_processLine(char* line) {
+  if (line[0] == '?') debugger_qm(line+1);
+  if (line[0] == '$') debugger_dl(line+1);
+  if (line[0] == '!') debugger_ex(line+1);
+  if (line[0] == 'b' || line[0] == 'B') debugger_b(line+1);
+  if (line[0] == 'c' || line[0] == 'C') debugger_c(line+1);
+  if (line[0] == 't' || line[0] == 'T') debugger_t(line+1);
+  if (line[0] == 'a' || line[0] == 'A') debugger_a(line+1);
+  if (line[0] == 's' || line[0] == 'S') debugger_s(line+1);
+  if (line[0] == 'x' || line[0] == 'X') debugger_x(line+1);
+  if (line[0] == 'y' || line[0] == 'Y') debugger_y(line+1);
+  if (line[0] == 'p' || line[0] == 'P') debugger_p(line+1);
+  if (line[0] == 'i' || line[0] == 'I') c6502_irq(&cpu);
+  if (line[0] == 'n' || line[0] == 'N') c6502_nmi(&cpu);
+  if (line[0] == 'r' || line[0] == 'R') {
+    c6502_reset(&cpu);
+    UpdateScreen();
+    }
+  }
+
+void debugger_load(char* line) {
+  int   i;
+  FILE *file;
+  char  buffer[1024];
+  file = fopen(line, "r");
+  if (file == NULL) return;
+  while ((fgets(buffer,1023,file)) != NULL) {
+    while (strlen(buffer) > 0 && buffer[strlen(buffer)-1] <= ' ')
+      buffer[strlen(buffer)-1] = 0;
+    debugger_processLine(buffer);
+    }
+  fclose(file);
   }
 
 void Debugger() {
@@ -421,6 +534,8 @@ void Debugger() {
   numBreakpoints = 0;
   tracing = 0;
   clocks = 0;
+  numConditions = 0;
+  useConditions = 'Y';
   DrawScreen();
   UpdateScreen();
   flag = -1;
@@ -433,25 +548,14 @@ void Debugger() {
     fgets(line, 1023, stdin);
     while (strlen(line) > 0 && line[strlen(line)-1] <= ' ')
       line[strlen(line)-1] = 0;
-    if (strcmp(line,"/") == 0) flag = 0;
-    if (line[0] == '?') debugger_qm(line+1);
-    if (line[0] == '$') debugger_dl(line+1);
-    if (line[0] == '!') debugger_ex(line+1);
-    if (line[0] == 'b' || line[0] == 'B') debugger_b(line+1);
-    if (line[0] == 't' || line[0] == 'T') debugger_t(line+1);
-    if (line[0] == 'a' || line[0] == 'A') debugger_a(line+1);
-    if (line[0] == 's' || line[0] == 'S') debugger_s(line+1);
-    if (line[0] == 'x' || line[0] == 'X') debugger_x(line+1);
-    if (line[0] == 'y' || line[0] == 'Y') debugger_y(line+1);
-    if (line[0] == 'p' || line[0] == 'P') debugger_p(line+1);
-    if (line[0] == '@') debugger_run(line+1);
-    if (line[0] == 'i' || line[0] == 'I') c6502_irq(&cpu);
-    if (line[0] == 'n' || line[0] == 'N') c6502_nmi(&cpu);
-    if (line[0] == 'r' || line[0] == 'R') {
-      c6502_reset(&cpu);
+    if (line[0] == '>') debugger_gt(line+1);
+    if (line[0] == '<') debugger_load(line+1);
+    else if (line[0] == '@') {
+      debugger_run(line+1);
       UpdateScreen();
       }
-    if (strlen(line) == 0) {
+    else if (strcmp(line,"/") == 0) flag = 0;
+    else if (strlen(line) == 0) {
       if (tracing) {
         Disassem(cpu.pc, dis);
         Output(dis);
@@ -459,6 +563,8 @@ void Debugger() {
       debugger_step();
       UpdateScreen();
       }
+    else debugger_processLine(line);
+
     }
   }
 

@@ -21,11 +21,11 @@ XImage  *image;
 typedef struct {
   word ScanLine;
   byte DotClock;
-  byte background;
+  byte colubk;
   byte vsync;
   byte vblank;
   byte ctrlpf;
-  byte pfForeground;
+  byte colupf;
   byte enam0;
   byte enam1;
   byte enabl;
@@ -52,8 +52,8 @@ typedef struct {
   byte refp1;
   byte resmp0;
   byte resmp1;
-  byte colorp0;
-  byte colorp1;
+  byte colup0;
+  byte colup1;
   byte cxm0p;
   byte cxm1p;
   byte cxp0fb;

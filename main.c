@@ -41,12 +41,13 @@ int main(int argc, char** argv) {
   int i;
   printf("Rc/VCS v1.0.0\n");
   printf("by Michael H. Riley\n");
-
   cpu.readMem = readMem;
   cpu.writeMem = writeMem;
   c6502_setup(&cpu);
   tia_init(&tia);
   pia_init(&pia);
+  tia.ScanLine = 40;
+  tia.DotClock = 69;
   clearMem();
   runDebugger = 0;
   pending_tia = 0;
@@ -86,15 +87,15 @@ int main(int argc, char** argv) {
                  break;
             case 0x05:
                  printf("GRP0:%02x POSP0:%02x HMP0:%02x, COLUP0:%02x\n",
-                        tia.grp0, tia.posp0, tia.hmp0, tia.colorp0);
+                        tia.grp0, tia.posp0, tia.hmp0, tia.colup0);
                  printf("GRP1:%02x POSP1:%02x HMP1:%02x, COLUP1:%02x\n",
-                        tia.grp1, tia.posp1, tia.hmp1, tia.colorp1);
+                        tia.grp1, tia.posp1, tia.hmp1, tia.colup1);
                  printf("ENABL:%02x POSBL:%02x HMBL:%02x, COLUBL:%02x\n",
-                        tia.enabl, tia.posbl, tia.hmbl, tia.pfForeground);
+                        tia.enabl, tia.posbl, tia.hmbl, tia.colupf);
                  printf("ENAM0:%02x POSM0:%02x HMM0:%02x, COLUM0:%02x\n",
-                        tia.enam0, tia.posm0, tia.hmm0, tia.colorp0);
+                        tia.enam0, tia.posm0, tia.hmm0, tia.colup0);
                  printf("ENAM1:%02x POSM1:%02x HMM1:%02x, COLUM1:%02x\n",
-                        tia.enam1, tia.posm1, tia.hmm1, tia.colorp1);
+                        tia.enam1, tia.posm1, tia.hmm1, tia.colup1);
                  break;
             case 0x06: printf("#%d\n",readMem(cpu.pc++)); break;
             case 0x0c: printf("\n"); break;

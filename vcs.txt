@@ -9,39 +9,92 @@ Debug commands:
   $FF $0C    - Print new line
   $FF $FF    - Exit emulator
 
-  ?              - dump memory
+  ?              - Dump memory
   ?C             - Show clock ticks since last clock reset
   ?C-            - Show clock ticks since last clock reset and reset
-  ?P             - dump memory from PC
-  ?PI            - show PIA registers
-  ?S             - dump stack
-  ?T             - show TIA registers
-  $              - disassemble memory
-  $P             - disassemble memory from PC
-  !addr bb bb .. - store bytes at address
-  !P bb bb  ..   - store bytes at PC
-  @              - run at PC
-  @addr          - set PC to addr then run
-  A=bb           - set A to bb
-  B?             - show break points
-  B+addr         - add break point
-  B-addr         - remove break point
-  BC             - clear all breakpoints
-  I              - trigger IRQ
-  N              - trigger NMI
-  P=bb           - set P to bb
-  PC=addr        - set PC to addr
+  ?P             - Dump memory from PC
+  ?PI            - Show PIA registers
+  ?S             - Dump stack
+  ?T             - Show TIA registers
+  $              - Disassemble memory
+  $P             - Disassemble memory from PC
+  !addr bb bb .. - Store bytes at address
+  !P bb bb  ..   - Store bytes at PC
+  @              - Run at PC
+  @addr          - Set PC to addr then run
+  A=bb           - Set A to bb
+  B?             - Show break points
+  B+addr         - Add break point
+  B-addr         - Remove break point
+  C+expr         - Add conditional breakpoint
+  C-num          - Remove specified conditional breakpoint
+  C?             - Show conditional breakpoints
+  C++            - Enable conditional breakpoints
+  C--            - Disable conditional breakpoints
+  CC             - Clear all conditional breakpoints
+  BC             - Clear all breakpoints
+  I              - Trigger IRQ
+  N              - Trigger NMI
+  P=bb           - Set P to bb
+  PC=addr        - Set PC to addr
   R              - Reset processor
-  S=bb           - set S to bb
-  T?             - show instruction traps
-  T+bb           - add instruction trap
-  T-bb           - remove instruction trap
-  TC             - clear all traps
-  TR+            - turn on command tracing
-  TR-            - turn off command tracing
-  X=bb           - set X to bb
-  Y=bb           - set Y to bb
-  /              - exit
+  S=bb           - Set S to bb
+  T?             - Show instruction traps
+  T+bb           - Add instruction trap
+  T-bb           - Remove instruction trap
+  TC             - Clear all traps
+  TR+            - Turn on command tracing
+  TR-            - Turn off command tracing
+  X=bb           - Set X to bb
+  Y=bb           - Set Y to bb
+  >file          - Write debug settings to file
+  <file          - Read debug settings from file
+  /              - Exit
+
+Conditional Expressions
+=======================
+  terms:
+    [addr]         - Contents of memory
+    [$addr]        - Contents of memory
+    $value         - Hex constant
+    %value         - Binary constant
+    value          - Decimal constant
+    A              - CPU A register
+    X              - CPU X register
+    Y              - CPU Y register
+    S              - CPU S register
+    P              - CPU P register
+    PC             - CPU PC register
+    VSYNC          - TIA VSYNC register
+    VBLANK         - TIA VBLANK register
+    GRP0           - TIA GRP0 register
+    GRP1           - TIA GRP1 register
+    POSP0          - TIA POSP0 register
+    POSP1          - TIA POSP1 register
+    HMP0           - TIA HMP0 register
+    HMP1           - TIA HMP1 register
+    REFP0          - TIA REFP0 register
+    REFP1          - TIA REFP1 register
+    ENAM0          - TIA ENAM0 register
+    ENAM1          - TIA ENAM1 register
+    POSM0          - TIA POSM0 register
+    POSM1          - TIA POSM1 register
+    RESMP0         - TIA RESMP0 register
+    RESMP1         - TIA RESMP1 register
+    HMM0           - TIA HMM0 register
+    HMM1           - TIA HMM1 register
+    ENABL          - TIA ENABL register
+    POSBL          - TIA POSBL register
+    HMBL           - TIA HMBL register
+    NUSIZ0         - TIA NUSIZ0 register
+    NUSIZ1         - TIA NUSIZ1 register
+    COLUBK         - TIA COLUBK register
+    COLUPF         - TIA COLUPF register
+    COLUP0         - TIA COLUP0 register
+    COLUP1         - TIA COLUP1 register
+    CTRLPF         - TIA CTRLPF register
+    SL             - TIA scan line
+    DC             - TIA dot clock
 
 VSYNC
 ---- --V-
